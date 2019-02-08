@@ -1,0 +1,14 @@
+module top
+(
+	input clk, reset, rx,
+	output tx, [3:0]q
+);
+
+	ripple_carry_counter rcc
+	(
+		.clk(clk)
+		.reset(reset)
+		.q(q)
+	);
+	
+	
