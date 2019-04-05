@@ -16,7 +16,7 @@ module RISC_V_Processor
   wire [31:0] Instruction;
   wire [63:0] out2;
   wire [63:0] out3;
-  assign out3 = 0;
+  //assign out3 = 0;
   wire [63:0] imm_data;
   
   wire [63:0] Result;

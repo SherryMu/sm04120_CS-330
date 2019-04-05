@@ -15,5 +15,5 @@ module tbRISC_V_Processor
     reset = 0;
   end
   always
-  #5 clk = ~clk;
+  #100 clk = ~clk;
 endmodule

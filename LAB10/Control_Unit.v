@@ -40,19 +40,19 @@ begin
     end
     7'b1100011 :
     begin
-      ALUSrc <= 1'b0; 
+      ALUSrc <= 1'b1; 
       MemtoReg <= 1'b0; 
-      RegWrite <= 1'b0; 
+      RegWrite <= 1'b1; 
       MemRead <= 1'b0;
       MemWrite <= 1'b0;
-      Branch <= 1'b1;
-      ALUOp <= 2'b01;
+      Branch <= 1'b0;
+      ALUOp <= 2'b00;
     end 
-    default :
+    7'b0010011 :
     begin
-      ALUSrc <= 1'b0; 
+      ALUSrc <= 1'b1; 
       MemtoReg <= 1'b0; 
-      RegWrite <= 1'b0; 
+      RegWrite <= 1'b1; 
       MemRead <= 1'b0;
       MemWrite <= 1'b0;
       Branch <= 1'b0;
@@ -60,5 +60,6 @@ begin
     end
   endcase 
 end
+
 
 endmodule

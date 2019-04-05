@@ -6,7 +6,7 @@ module Program_Counter
 );
 
 initial
-PC_Out = 64'b0;
+PC_Out = 0;
 
   always @(posedge clk)
     begin
