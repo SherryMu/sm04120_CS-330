@@ -7,13 +7,15 @@ module EX_MEM
   input mux_in,
   input [4:0] rd_in,
   input clk,
+  input Zero,
   
   output reg [1:0]wb_out,
   output reg [2:0]m_out,
   output reg [63:0]adder_out_out,
   output reg [63:0] alu_result_out,
   output reg mux_out,
-  output reg [4:0] rd_out
+  output reg [4:0] rd_out,
+  output reg Zero_out
 );
 
 always @(posedge clk)
