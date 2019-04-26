@@ -8,7 +8,7 @@ module Control_Unit
 always @ (Opcode)
 begin
   case ({Opcode})
-    7'b0110011 :
+    7'b0110011 : 
     begin 
       ALUSrc <= 1'b0; 
       MemtoReg <= 1'b0; 

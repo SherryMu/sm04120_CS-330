@@ -16,7 +16,7 @@ module RISC_V_Processor_Pipelined
   wire [31:0] Instruction;
   wire [63:0] out2;
   wire [63:0] out3;
-  //assign out3 = 0;
+  
   wire [63:0] imm_data;
   
   wire [63:0] Result;
@@ -52,6 +52,11 @@ module RISC_V_Processor_Pipelined
   wire [63:0] ex_mem_mux_out;
   wire [4:0] ex_mem_rd_out;
   wire ex_mem_zero_out;
+  
+  wire [4:0]mem_wb_rd_out;
+  wire [63:0]mem_wb_alu_out;
+  wire [63:0]mem_wb_read_data_out;
+  wire [1:0]mem_wb_wb_out;
   Adder add1
   (
     .a(PC_Out),
@@ -125,12 +130,12 @@ module RISC_V_Processor_Pipelined
     .WriteData(WriteData),
     .RS1(rs1),
     .RS2(rs2),
-    .RD(rd),
+    .RD(mem_wb_rd_out),
     .ReadData1(ReadData1),
     .ReadData2(ReadData2),
     .clk(clk),
     .reset(reset),
-    .RegWrite(RegWrite)
+    .RegWrite(mem_wb_wb_out[1])
   );
   wire [63:0] b;
   Mux mux2
@@ -144,13 +149,13 @@ module RISC_V_Processor_Pipelined
   ALU_Control ac
   (
     .ALUOp(id_ex_ex_out[1:0]),
-    .Funct(),
+    .Funct(id_ex_funct4_out),
     .Operation(Operation)
   );
   
   ALU_64_bit alu
   (
-    .a(tbmout1),
+    .a(tbmout),
     .b(b),
     .ALUOp(Operation),
     .Result(Result),
@@ -159,26 +164,27 @@ module RISC_V_Processor_Pipelined
   wire [63:0] Read_Data;
   Data_Memory dm
   (
-    .Mem_Addr(Result),
-    .Write_Data(ReadData2),
+    .Mem_Addr(ex_mem_alu_result_out),
+    .Write_Data(ex_mem_mux_out),
     .clk(clk),
     .MemWrite(MemWrite),
     .MemRead(MemRead),
     .Read_Data(Read_Data)
   );
   
-  Mux mux3
+  Mux mux3 
   (
-    .b(Read_Data),
-    .a(Result),
-    .sel(MemtoReg),
+    .b(mem_wb_read_data_out),
+    .a(mem_wb_alu_out),
+    .sel(mem_wb_wb_out[0]),
     .data(WriteData)
   );
   IF_ID if_id
   (
     .pc_in(PC_Out),
     .clk(clk),
-    .im_in(Instuction),
+    .reset(reset),
+    .im_in(Instruction),
     .pc_out(if_id_pc_out),
     .im_out(if_id_im_out)
   );
@@ -212,25 +218,25 @@ module RISC_V_Processor_Pipelined
     three_bit_Mux tbm
     (
       .a(id_ex_read_data1_out),
-      .b()
-      .c(ex_mem_alu_result_out)
-      .sel(ForwardA)
+      .b(WriteData),
+      .c(ex_mem_alu_result_out),
+      .sel(ForwardA),
       .data(tbmout)
     );
     three_bit_Mux tbm2
     (
       .a(id_ex_read_data2_out),
-      .b()
-      .c(ex_mem_alu_result_out)
-      .sel(ForwardB)
+      .b(WriteData),
+      .c(ex_mem_alu_result_out),
+      .sel(ForwardB),
       .data(tbmout2)
     );
     Forwarding_Unit fu
     (
       .rd_from_mem(ex_mem_rd_out),
-      .rd_from_wb(),
+      .rd_from_wb(mem_wb_rd_out),
       .Regwrite_from_mem(ex_mem_wb_out[1]),
-      .Regwrite_from_wb(),
+      .Regwrite_from_wb(mem_wb_wb_out[1]),
       .rs1_from_ex(id_ex_rs1_out),
       .rs2_from_ex(id_ex_rs2_out),
   
@@ -246,13 +252,26 @@ module RISC_V_Processor_Pipelined
       .mux_in(tbmout2),
       .rd_in(id_ex_rd_out),
       .clk(clk),
-      .Zero(Zero)
+      .reset(reset),
+      .Zero(Zero),
       .wb_out(ex_mem_wb_out),
       .m_out(ex_mem_m_out),
       .adder_out_out(ex_mem_adder_out_out),
       .alu_result_out(ex_mem_alu_result_out),
       .mux_out(ex_mem_mux_out),
-      .rd_out(ex_mem_rd_out);
+      .rd_out(ex_mem_rd_out),
       .Zero_out(ex_mem_zero_out)
+    );
+    MEM_WB mem_wb
+    (
+      .rd_in(ex_mem_rd_out),
+      .alu_in(ex_mem_alu_result_out),
+      .read_data_in(Read_Data),
+      .wb_in(ex_mem_wb_out),
+      .clk(clk),
+      .rd_out(mem_wb_rd_out),
+      .alu_out(mem_wb_alu_out),
+      .read_data_out(mem_wb_read_data_out),
+      .wb_out(mem_wb_wb_out)
     );
 endmodule

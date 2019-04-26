@@ -13,7 +13,7 @@ module ID_EX
   input [2:0]ex_in,
   
   input clk,
-
+  
   output reg [63:0]pc_out,
   output reg [63:0]imm_data_out,
   output reg [63:0]read_data1_out,
